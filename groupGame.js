@@ -9,8 +9,9 @@
 // animation, sphere collision, and color effects were
 // all done by me.
 
-import './style.css';
-import * as THREE from 'three';
+// import './style.css';
+import './three.js';
+// import * as THREE from 'three';
 
 const speed = 0.5
 const sphereCount = 4;
