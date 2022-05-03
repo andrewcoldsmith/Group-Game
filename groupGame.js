@@ -10,7 +10,7 @@
 // all done by me.
 
 // import './style.css';
-import './three.js';
+// import './three.js';
 // import * as THREE from 'three';
 
 const speed = 0.5
@@ -108,126 +108,126 @@ sphere1.material.color.setHSL(hue[0], 1, 0.5);
 sphere1.castShadow = true;
 sphere1.receiveShadow = true;
 spheres.push(sphere1);
-sphere1.position.x = -30;
-sphere1.position.y = 12;
-sphere1.position.z = -18;
+sphere1.position.x = 0;
+sphere1.position.y = -18;
+sphere1.position.z = 20;
 scene.add(sphere1);
 
-const sphereMat2 = new THREE.MeshPhongMaterial({wireframe: false});
-const sphere2 = new THREE.Mesh(sphereGeo, sphereMat2);
-sphere2.material.color.setHSL(hue[1], 1, 0.5);
-sphere2.castShadow = true;
-sphere2.receiveShadow = true;
-spheres.push(sphere2);
-sphere2.position.x = 10;
-sphere2.position.y = 10;
-sphere2.position.z = -12;
-scene.add(sphere2);
+// const sphereMat2 = new THREE.MeshPhongMaterial({wireframe: false});
+// const sphere2 = new THREE.Mesh(sphereGeo, sphereMat2);
+// sphere2.material.color.setHSL(hue[1], 1, 0.5);
+// sphere2.castShadow = true;
+// sphere2.receiveShadow = true;
+// spheres.push(sphere2);
+// sphere2.position.x = 10;
+// sphere2.position.y = 10;
+// sphere2.position.z = -12;
+// scene.add(sphere2);
 
-const sphereMat3 = new THREE.MeshPhongMaterial({wireframe: false});
-const sphere3 = new THREE.Mesh(sphereGeo, sphereMat3);
-sphere3.material.color.setHSL(hue[2], 1, 0.5);
-sphere3.castShadow = true;
-sphere3.receiveShadow = true;
-spheres.push(sphere3);
-sphere3.position.x = -10;
-sphere3.position.y = -10;
-sphere3.position.z = 12;
-scene.add(sphere3);
+// const sphereMat3 = new THREE.MeshPhongMaterial({wireframe: false});
+// const sphere3 = new THREE.Mesh(sphereGeo, sphereMat3);
+// sphere3.material.color.setHSL(hue[2], 1, 0.5);
+// sphere3.castShadow = true;
+// sphere3.receiveShadow = true;
+// spheres.push(sphere3);
+// sphere3.position.x = -10;
+// sphere3.position.y = -10;
+// sphere3.position.z = 12;
+// scene.add(sphere3);
 
-const sphereMat4 = new THREE.MeshPhongMaterial({wireframe: false});
-const sphere4 = new THREE.Mesh(sphereGeo, sphereMat4);
-sphere4.material.color.setHSL(hue[3], 1, 0.5);
-sphere4.castShadow = true;
-sphere4.receiveShadow = true;
-spheres.push(sphere4);
-sphere4.position.x = 30;
-sphere4.position.y = -12;
-sphere4.position.z = 18;
-scene.add(sphere4);
+// const sphereMat4 = new THREE.MeshPhongMaterial({wireframe: false});
+// const sphere4 = new THREE.Mesh(sphereGeo, sphereMat4);
+// sphere4.material.color.setHSL(hue[3], 1, 0.5);
+// sphere4.castShadow = true;
+// sphere4.receiveShadow = true;
+// spheres.push(sphere4);
+// sphere4.position.x = 30;
+// sphere4.position.y = -12;
+// sphere4.position.z = 18;
+// scene.add(sphere4);
 
 renderer.render(scene, camera);
 
 function animate() {
   requestAnimationFrame(animate);
 
-  for (let i = 0; i < sphereCount; i++) {
-    hue[i] += (0.001 * (i + 1));
-    if (hue[i] > 1) {
-      hue[i] = 0.000;
-    }
-    spheres[i].material.color.setHSL(hue[i], 1, 0.5);
+  // for (let i = 0; i < sphereCount; i++) {
+  //   hue[i] += (0.001 * (i + 1));
+  //   if (hue[i] > 1) {
+  //     hue[i] = 0.000;
+  //   }
+  //   spheres[i].material.color.setHSL(hue[i], 1, 0.5);
 
-    spheres[i].position.x += x[i];
-    spheres[i].position.y += y[i];
-    spheres[i].position.z += z[i];
+  //   spheres[i].position.x += x[i];
+  //   spheres[i].position.y += y[i];
+  //   spheres[i].position.z += z[i];
 
-    if (spheres[i].position.x > 40) {
-      x[i] = -speed;
-    }
-    if (spheres[i].position.x < -40) {
-      x[i] = speed;
-    }
-    if (spheres[i].position.y > 18) {
-      y[i] = -speed;
-    }
-    if (spheres[i].position.y < -18) {
-      y[i] = speed;
-    }
-    if (spheres[i].position.z > 25) {
-      z[i] = -speed;
-    }
-    if (spheres[i].position.z < -25) {
-      z[i] = speed;
-    }
+  //   if (spheres[i].position.x > 40) {
+  //     x[i] = -speed;
+  //   }
+  //   if (spheres[i].position.x < -40) {
+  //     x[i] = speed;
+  //   }
+  //   if (spheres[i].position.y > 18) {
+  //     y[i] = -speed;
+  //   }
+  //   if (spheres[i].position.y < -18) {
+  //     y[i] = speed;
+  //   }
+  //   if (spheres[i].position.z > 25) {
+  //     z[i] = -speed;
+  //   }
+  //   if (spheres[i].position.z < -25) {
+  //     z[i] = speed;
+  //   }
 
-    for (let j = i + 1; j < sphereCount; j++) {
-      let xyzDif = [
-        {axis: "x", value: Math.abs(spheres[i].position.x - spheres[j].position.x)},
-        {axis: "y", value: Math.abs(spheres[i].position.y - spheres[j].position.y)},
-        {axis: "z", value: Math.abs(spheres[i].position.z - spheres[j].position.z)}
-      ];
-      if (xyzDif[0].value < (2 * radius) && xyzDif[1].value < (2 * radius) && xyzDif[2].value < (2 * radius)) {
-        console.log("*plink*");
-        let hueSwitch = hue[i];
-        hue[i] = hue[j];
-        hue[j] = hueSwitch;
-        xyzDif.sort(function(a, b){return b.value - a.value});
-        if (xyzDif[0].axis == "x") {
-          if (spheres[i].position.x > spheres[j].position.x) {
-            x[i] = speed;
-            x[j] = -speed;
-          }
-          else { // if (spheres[i].position.x < spheres[j].position.x)
-            x[i] = -speed;
-            x[j] = speed;
-          }
-        }
-        else if (xyzDif[0].axis == "y") {
-          if (spheres[i].position.y > spheres[j].position.y) {
-            y[i] = speed;
-            y[j] = -speed;
-          }
-          else { // if (spheres[i].position.y < spheres[j].position.y)
-            y[i] = -speed;
-            y[j] = speed;
-          }
-        }
-        else { // if (xyzDif[0].axis == "z")
-          if (spheres[i].position.z > spheres[j].position.z) {
-            z[i] = speed;
-            z[j] = -speed;
-          }
-          else { // if (spheres[i].position.z < spheres[j].position.z)
-            z[i] = -speed;
-            z[j] = speed;
-          }
-        }
-      }
-    }
-  }
+  //   for (let j = i + 1; j < sphereCount; j++) {
+  //     let xyzDif = [
+  //       {axis: "x", value: Math.abs(spheres[i].position.x - spheres[j].position.x)},
+  //       {axis: "y", value: Math.abs(spheres[i].position.y - spheres[j].position.y)},
+  //       {axis: "z", value: Math.abs(spheres[i].position.z - spheres[j].position.z)}
+  //     ];
+  //     if (xyzDif[0].value < (2 * radius) && xyzDif[1].value < (2 * radius) && xyzDif[2].value < (2 * radius)) {
+  //       console.log("*plink*");
+  //       let hueSwitch = hue[i];
+  //       hue[i] = hue[j];
+  //       hue[j] = hueSwitch;
+  //       xyzDif.sort(function(a, b){return b.value - a.value});
+  //       if (xyzDif[0].axis == "x") {
+  //         if (spheres[i].position.x > spheres[j].position.x) {
+  //           x[i] = speed;
+  //           x[j] = -speed;
+  //         }
+  //         else { // if (spheres[i].position.x < spheres[j].position.x)
+  //           x[i] = -speed;
+  //           x[j] = speed;
+  //         }
+  //       }
+  //       else if (xyzDif[0].axis == "y") {
+  //         if (spheres[i].position.y > spheres[j].position.y) {
+  //           y[i] = speed;
+  //           y[j] = -speed;
+  //         }
+  //         else { // if (spheres[i].position.y < spheres[j].position.y)
+  //           y[i] = -speed;
+  //           y[j] = speed;
+  //         }
+  //       }
+  //       else { // if (xyzDif[0].axis == "z")
+  //         if (spheres[i].position.z > spheres[j].position.z) {
+  //           z[i] = speed;
+  //           z[j] = -speed;
+  //         }
+  //         else { // if (spheres[i].position.z < spheres[j].position.z)
+  //           z[i] = -speed;
+  //           z[j] = speed;
+  //         }
+  //       }
+  //     }
+  //   }
+  // }
 
-  renderer.render(scene, camera);
+  // renderer.render(scene, camera);
 }
 
 animate();

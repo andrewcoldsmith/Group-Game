@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<meta charset="utf-8">
-		<title>My first three.js app</title>
+		<title>Golf Game</title>
 		<style>
 			body { margin: 0; }
 		</style>
@@ -20,19 +20,19 @@
             let z = [];
             let hue = [];
             for (let i = 0; i < sphereCount; i++) {
-            x.push(Math.random() < 0.5 ? -speed : speed);
-            y.push(Math.random() < 0.5 ? -speed : speed);
-            z.push(Math.random() < 0.5 ? -speed : speed);
+                x.push(Math.random() < 0.5 ? -speed : speed);
+                y.push(Math.random() < 0.5 ? -speed : speed);
+                z.push(Math.random() < 0.5 ? -speed : speed);
             }
             for (let i = 0; i < sphereCount; i++) {
-            hue.push(Math.trunc(Math.random() * 1000) / 1000);
+                hue.push(Math.trunc(Math.random() * 1000) / 1000);
             }
             let radius = 6;
 
             const scene = new THREE.Scene();
             const camera = new THREE.PerspectiveCamera(75, window.innerWidth  / window.innerHeight, 0.1, 1000);
             const renderer = new THREE.WebGLRenderer({
-            canvas: document.querySelector('#bg'),
+                canvas: document.querySelector('#bg'),
             });
 
             renderer.shadowMap.enabled = true;
