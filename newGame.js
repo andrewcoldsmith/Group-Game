@@ -1,6 +1,17 @@
 //variable declaration section
 let physicsWorld, scene, camera, renderer, rigidBodies = [], tmpTrans = null
+let pos = new THREE.Vector3()
+let mouseCoords = new THREE.Vector2(), raycaster = new THREE.Raycaster();
+let wall, ball;
 let platform = null;
+let xClickD = 0;
+let yClickD = 0;
+let xClickU = 0;
+let yClickU = 0;
+let cv = document.querySelector("#canvas");
+const ballStartPos = {x: 0, y: 4, z: 40};
+const goalPos = {x: (Math.random() - 0.5) * 60, y: 1.3, z: (Math.random() * -10) - 20};
+const STATE = { DISABLE_DEACTIVATION : 4 };
 
 Ammo().then(start)
 
@@ -12,8 +23,9 @@ function start (){
 
     setupGraphics();
     createBlock();
-    createBall();
-    createGoal();
+    ball = createBall(ballStartPos);
+    createGoal(goalPos);
+    setupEventHandlers();
 
     renderFrame();
 
@@ -102,8 +114,6 @@ function renderFrame(){
 }
 
 
-
-
 function createBlock(){
     
     let pos = {x: 0, y: 0, z: 0};
@@ -146,24 +156,24 @@ function createBlock(){
 }
 
 
-function createBall(){
+function createBall(pos){
     
-    let pos = {x: 0, y: 4, z: 40};
+    // let pos = {x: 0, y: 4, z: 40};
     let radius = 2;
     let quat = {x: 0, y: 0, z: 0, w: 1};
     let mass = 1;
 
     //threeJS Section
-    let ball = new THREE.Mesh(new THREE.SphereBufferGeometry(radius), new THREE.MeshPhongMaterial({color: 0xffffff}));
+    let createdBall = new THREE.Mesh(new THREE.SphereBufferGeometry(radius), new THREE.MeshPhongMaterial({color: 0xffffff}));
 
-    ball.position.set(pos.x, pos.y, pos.z);
+    createdBall.position.set(pos.x, pos.y, pos.z);
     
-    ball.castShadow = true;
-    ball.receiveShadow = true;
+    createdBall.castShadow = true;
+    createdBall.receiveShadow = true;
 
-    scene.add(ball);
+    scene.add(createdBall);
 
-
+    
     //Ammojs Section
     let transform = new Ammo.btTransform();
     transform.setIdentity();
@@ -183,17 +193,21 @@ function createBall(){
     body.setFriction(4);
     body.setRollingFriction(10);
 
+    body.setActivationState( STATE.DISABLE_DEACTIVATION )
 
     physicsWorld.addRigidBody( body );
+    rigidBodies.push(createdBall);
     
-    ball.userData.physicsBody = body;
-    rigidBodies.push(ball);
+    createdBall.userData.physicsBody = body;
+    createdBall.userData.tag = "ball";
+                
+    return createdBall;
 }
 
 
-function createGoal(){
+function createGoal(pos){
     
-    let pos = {x: 0, y: 1.3, z: -30};
+    // let pos = {x: 0, y: 1.3, z: -30};
     let radius = 2;
     let quat = {x: 0, y: 0, z: 0, w: 1};
     let mass = 1;
@@ -207,32 +221,6 @@ function createGoal(){
     goal.receiveShadow = true;
 
     scene.add(goal);
-
-
-    //Ammojs Section
-    // let transform = new Ammo.btTransform();
-    // transform.setIdentity();
-    // transform.setOrigin( new Ammo.btVector3( pos.x, pos.y, pos.z ) );
-    // transform.setRotation( new Ammo.btQuaternion( quat.x, quat.y, quat.z, quat.w ) );
-    // let motionState = new Ammo.btDefaultMotionState( transform );
-
-    // let colShape = new Ammo.btSphereShape( radius );
-    // colShape.setMargin( 0.05 );
-
-    // let localInertia = new Ammo.btVector3( 0, 0, 0 );
-    // colShape.calculateLocalInertia( mass, localInertia );
-
-    // let rbInfo = new Ammo.btRigidBodyConstructionInfo( mass, motionState, colShape, localInertia );
-    // let body = new Ammo.btRigidBody( rbInfo );
-
-    // body.setFriction(4);
-    // body.setRollingFriction(10);
-
-
-    // physicsWorld.addRigidBody( body );
-    
-    // goal.userData.physicsBody = body;
-    // rigidBodies.push(goal);
 }
 
 
@@ -256,87 +244,66 @@ function updatePhysics( deltaTime ){
 
         }
     }
-
-    detectCollision();
-
 }
 
-function detectCollision(){
+function setupEventHandlers(){
 
-	let dispatcher = physicsWorld.getDispatcher();
-	let numManifolds = dispatcher.getNumManifolds();
-
-	for ( let i = 0; i < numManifolds; i ++ ) {
-
-		let contactManifold = dispatcher.getManifoldByIndexInternal( i );
-		let numContacts = contactManifold.getNumContacts();
-
-		for ( let j = 0; j < numContacts; j++ ) {
-
-			let contactPoint = contactManifold.getContactPoint( j );
-			let distance = contactPoint.getDistance();
-
-            if( distance > 0.0 ) {
-			    console.log({manifoldIndex: i, contactIndex: j, distance: distance});
-            }
-		}
-
-
-	}
-
+    window.addEventListener( 'mousedown', onMouseDown, false );
+    
 }
 
-// const speed = 0.5
-// const sphereCount = 4;
-// let spheres = [];
-// let x = [];
-// let y = [];
-// let z = [];
-// let hue = [];
-// for (let i = 0; i < sphereCount; i++) {
-//   x.push(Math.random() < 0.5 ? -speed : speed);
-//   y.push(Math.random() < 0.5 ? -speed : speed);
-//   z.push(Math.random() < 0.5 ? -speed : speed);
-// }
-// for (let i = 0; i < sphereCount; i++) {
-//   hue.push(Math.trunc(Math.random() * 1000) / 1000);
-// }
-// let radius = 6;
+function onMouseDown (event) {
+    xClickD = event.pageX;
+    yClickD = event.pageY;
+    console.log(`down: ${xClickD.toFixed(2)}, ${yClickD.toFixed(2)}`);
+    window.removeEventListener("mousedown", onMouseDown);
+    window.addEventListener( "mouseup", onMouseUp, false );
+}
 
-// const scene = new THREE.Scene();
-// const camera = new THREE.PerspectiveCamera(75, window.innerWidth  / window.innerHeight, 0.1, 1000);
-// const renderer = new THREE.WebGLRenderer({
-//   canvas: document.querySelector('#bg'),
-// });
+function onMouseUp (event) {
+    xClickU = event.pageX;
+    yClickU = event.pageY;
+    console.log(`up: ${xClickU.toFixed(2)}, ${yClickU.toFixed(2)}`);
+    window.removeEventListener("mouseup", onMouseUp);
 
-// renderer.shadowMap.enabled = true;
+    let resultantImpulse = new Ammo.btVector3(0.5 * (xClickD - xClickU), 0.5 * (yClickU - yClickD), -8)
+    ball.userData.physicsBody.applyImpulse( resultantImpulse );
+}
 
-// renderer.setPixelRatio(window.devicePixelRatio);
-// renderer.setSize(window.innerWidth, window.innerHeight);
-// camera.position.setZ(45);
+document.body.onkeyup = function(e) {
+    if(e.keyCode == 32) {
+        scene.remove(ball);
+        ball = createBall(ballStartPos);
+        setupEventHandlers();
+    }
+}
 
-// renderer.render(scene, camera);
-
-// const ambLight = new THREE.AmbientLight(0x404040);
-// scene.add(ambLight);
-
-// const pointLight = new THREE.PointLight(0xffffff, 1, 700);
-// pointLight.position.set(35, 10, 40);
-// pointLight.castShadow = true;
-// scene.add(pointLight);
-
-// pointLight.shadow.mapSize.width = 712;
-// pointLight.shadow.mapSize.height = 712;
-// pointLight.shadow.camera.near = 7;
-// pointLight.shadow.camera.far = 500;
-
-// const plane4Geo = new THREE.PlaneGeometry(80 + (2 * radius), 50 + (2 * radius));
-// const plane4Mat = new THREE.MeshPhongMaterial({
-//   color: 0x7c7d80, side: THREE.DoubleSide, wireframe: false});
-// const plane4 = new THREE.Mesh(plane4Geo, plane4Mat);
-// plane4.receiveShadow = true;
-// plane4.rotateX(Math.PI / 2);
-// plane4.position.y = -(18 + radius);
-// scene.add(plane4);
-
-// renderer.render(scene, camera);
+function getBallVelocity( ballPos, rimPos, angleDegrees, gravity ){
+ 
+    // Get angle in radians, from angleDegrees argument
+    const angle = THREE.Math.degToRad( angleDegrees );
+   
+    gravity = gravity || 9.81;
+   
+    // Positions of this object and the target on the same plane
+    const planarRimPos  = new THREE.Vector3( rimPos.x, 0, rimPos.z ),
+          planarBallPos = new THREE.Vector3( ballPos.x, 0, ballPos.z );
+   
+    // Planar distance between objects
+    const distance = planarRimPos.distanceTo( planarBallPos );
+   
+    // Distance along the y axis between objects
+    const yOffset = ballPos.y - rimPos.y;
+   
+    // Calculate velocity
+    const initialVelocity = ( 1 / Math.cos( angle ) ) * Math.sqrt( ( 0.5 * gravity * Math.pow( distance, 2 ) ) / ( distance * Math.tan( angle ) + yOffset ) ),
+          velocity = new THREE.Vector3( 0, initialVelocity * Math.sin( angle ), initialVelocity * Math.cos( angle ) );
+     
+    // Rotate our velocity to match the direction between the two objects
+    const dy = planarRimPos.x - planarBallPos.x,
+          dx = planarRimPos.z - planarBallPos.z,
+          theta = Math.atan2( dy, dx ),
+          finalVelocity = velocity.applyAxisAngle( PopAShotAR.Vector3.up, theta )
+   
+    return finalVelocity;
+}
