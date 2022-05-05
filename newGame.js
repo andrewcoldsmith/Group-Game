@@ -8,10 +8,16 @@ let xClickD = 0;
 let yClickD = 0;
 let xClickU = 0;
 let yClickU = 0;
+let radius = 6;
 let cv = document.querySelector("#canvas");
 const ballStartPos = {x: 0, y: 4, z: 40};
 const goalPos = {x: (Math.random() - 0.5) * 60, y: 1.3, z: (Math.random() * -10) - 20};
 const STATE = { DISABLE_DEACTIVATION : 4 };
+//Camera stuff
+const cameraCenter = new THREE.Vector3();
+const cameraHorzLimit = 50;
+const cameraVertLimit = 50;
+const mouse = new THREE.Vector2();
 
 Ammo().then(start)
 
@@ -19,9 +25,19 @@ function start (){
 
     tmpTrans = new Ammo.btTransform();
 
+    //set up mouse stuff
+    document.addEventListener('mousemove', onDocumentMouseMove, false);
+    // window.addEventListener("mouseup", mouseupHandler);
+    // window.addEventListener("mousedown", onDocumentMouseMove, false);
+    window.addEventListener('resize', onWindowResize, false);
+
     setupPhysicsWorld();
 
     setupGraphics();
+    createBalls();
+    createDonuts();
+    createCylinders();
+    createStart();
     createBlock();
     ball = createBall(ballStartPos);
     createGoal(goalPos);
@@ -104,6 +120,10 @@ function setupGraphics(){
 function renderFrame(){
 
     let deltaTime = clock.getDelta();
+
+    updateCamera();
+
+    renderer.render(scene, camera);
 
     updatePhysics( deltaTime );
 
@@ -213,7 +233,7 @@ function createGoal(pos){
     let mass = 1;
 
     //threeJS Section
-    let goal = new THREE.Mesh(new THREE.SphereBufferGeometry(radius), new THREE.MeshPhongMaterial({color: 0x55ff55}));
+    let goal = new THREE.Mesh(new THREE.SphereBufferGeometry(radius), new THREE.MeshPhongMaterial({color: 0x050505}));
 
     goal.position.set(pos.x, pos.y, pos.z);
     
@@ -306,4 +326,209 @@ function getBallVelocity( ballPos, rimPos, angleDegrees, gravity ){
           finalVelocity = velocity.applyAxisAngle( PopAShotAR.Vector3.up, theta )
    
     return finalVelocity;
+}
+
+function randInt(min, max) {
+    return parseInt(Math.random()*(max-min)+min);
+}
+
+function rand(min, max) {
+    return Math.random()*(max-min)+min;
+}
+
+// Creates the five green panels of the room
+// and the invisible wall for us to look into.
+function createRoom() {
+    const plane1Geo = new THREE.PlaneGeometry(50 + (2 * radius), 36 + (2 * radius));
+    const plane1Mat = new THREE.MeshPhongMaterial({
+    color: 0x60c95d, side: THREE.DoubleSide, wireframe: false});
+    const plane1 = new THREE.Mesh(plane1Geo, plane1Mat);
+    plane1.receiveShadow = true;
+    plane1.rotateY(Math.PI / 2);
+    plane1.position.x = -(40 + radius);
+    scene.add(plane1);
+
+    const plane2Geo = new THREE.PlaneGeometry(50 + (2 * radius), 36 + (2 * radius));
+    const plane2Mat = new THREE.MeshPhongMaterial({
+    color: 0x60c95d, side: THREE.DoubleSide, wireframe: false});
+    const plane2 = new THREE.Mesh(plane2Geo, plane2Mat);
+    plane2.receiveShadow = true;
+    plane2.rotateY(Math.PI / 2);
+    plane2.position.x = 40 + radius;
+    scene.add(plane2);
+
+    const plane3Geo = new THREE.PlaneGeometry(80 + (2 * radius), 36 + (2 * radius));
+    const plane3Mat = new THREE.MeshPhongMaterial({
+    color: 0x60c95d, side: THREE.DoubleSide, wireframe: false});
+    const plane3 = new THREE.Mesh(plane3Geo, plane3Mat);
+    plane3.receiveShadow = true;
+    plane3.position.z = -(25 + radius);
+    scene.add(plane3);
+
+    const plane4Geo = new THREE.PlaneGeometry(80 + (2 * radius), 50 + (2 * radius));
+    const plane4Mat = new THREE.MeshPhongMaterial({
+    color: 0x60c95d, side: THREE.DoubleSide, wireframe: false});
+    const plane4 = new THREE.Mesh(plane4Geo, plane4Mat);
+    plane4.receiveShadow = true;
+    plane4.rotateX(Math.PI / 2);
+    plane4.position.y = -(18 + radius);
+    scene.add(plane4);
+
+    const plane5Geo = new THREE.PlaneGeometry(80 + (2 * radius), 50 + (2 * radius));
+    const plane5Mat = new THREE.MeshPhongMaterial({
+    color: 0x60c95d, side: THREE.DoubleSide, wireframe: false});
+    const plane5 = new THREE.Mesh(plane5Geo, plane5Mat);
+    plane5.receiveShadow = true;
+    plane5.rotateX(Math.PI / 2);
+    plane5.position.y = 18 + radius;
+    scene.add(plane5);
+}
+
+// Generates a random amount of colored balls
+// of random size and position throughout the golf course.
+function createBalls() {
+    let n = randInt(5, 12);
+    for (let i=0; i < n; i++) {
+        // let pos = {x: 0, y: 4, z: 40};
+        let radius = 2;
+        let quat = {x: 0, y: 0, z: 0, w: 1};
+        let mass = 1;
+
+        const r = randInt(1, 6);
+        const bigSphereGeo = new THREE.SphereGeometry(r, 32, 16);
+        const bigSphereMat = new THREE.MeshPhongMaterial({wireframe: false});
+        const bigSphere = new THREE.Mesh(bigSphereGeo, bigSphereMat);
+        bigSphere.material.color.setHSL(rand(0, 1), 4, 0.5);
+        bigSphere.castShadow = true;
+        bigSphere.receiveShadow = true;
+        bigSphere.position.x = randInt(-40, 40);
+        bigSphere.position.y = randInt(-18, 16);
+        bigSphere.position.z = randInt(-25, 25);
+        scene.add(bigSphere);
+
+        //Ammojs Section
+        // let transform = new Ammo.btTransform();
+        // transform.setIdentity();
+        // transform.setOrigin( new Ammo.btVector3( pos.x, pos.y, pos.z ) );
+        // transform.setRotation( new Ammo.btQuaternion( quat.x, quat.y, quat.z, quat.w ) );
+        // let motionState = new Ammo.btDefaultMotionState( transform );
+
+        // let colShape = new Ammo.btSphereShape( radius );
+        // colShape.setMargin( 0.05 );
+
+        // let localInertia = new Ammo.btVector3( 0, 0, 0 );
+        // colShape.calculateLocalInertia( mass, localInertia );
+
+        // let rbInfo = new Ammo.btRigidBodyConstructionInfo( mass, motionState, colShape, localInertia );
+        // let body = new Ammo.btRigidBody( rbInfo );
+
+        // body.setFriction(4);
+        // body.setRollingFriction(10);
+
+        // body.setActivationState( STATE.DISABLE_DEACTIVATION )
+
+        // physicsWorld.addRigidBody( body );
+        // rigidBodies.push(bigSphere);
+        
+        // bigSphere.userData.physicsBody = body;
+        // bigSphere.userData.tag = "ball";
+    }
+}
+
+// Generates a random amount of toruses
+// of random size and position throughout the golf course.
+function createDonuts() {
+    //Sam's blue donuts
+    let n = randInt(2, 4);
+    for (let i = 0; i < n; i++) {
+        const R = randInt(6, 16);
+        const r = randInt(2, 7);
+        const donutGeo = new THREE.TorusGeometry(R, r, 30, 50);
+        const donutMat = new THREE.MeshPhongMaterial({
+            color: 0x3373ab, wireframe: false});
+        const donut = new THREE.Mesh(donutGeo, donutMat);
+        donut.rotateX(rand(0, 2*Math.PI));
+        donut.rotateY(rand(0, 2*Math.PI));
+        donut.rotateZ(rand(0, 2*Math.PI));
+        donut.castShadow = true;
+        donut.receiveShadow = true;
+        donut.position.x = randInt(-40, 40);
+        donut.position.y = randInt(-18, 0);
+        donut.position.z = randInt(-25, 25);
+        scene.add(donut);
+    }
+}
+
+// Generates a random amount of cylinders or cones
+// of random size and position throughout the golf course.
+function createCylinders() {
+    let n = randInt(2, 5);
+    for (let i = 0; i < n; i++) {
+        const r1 = randInt(0, 12);
+        const r2 = randInt(0, 12);
+        const h = randInt(3, 16);
+        const cylinderGeo = new THREE.CylinderGeometry(r1, r2, h, 50, 2);
+        const cylinderMat = new THREE.MeshPhongMaterial({
+            color: 0x207a1d, wireframe: false});
+        const cylinder = new THREE.Mesh(cylinderGeo, cylinderMat);
+        cylinder.rotateX(rand(0, 2*Math.PI));
+        cylinder.rotateY(rand(0, 2*Math.PI));
+        cylinder.rotateZ(rand(0, 2*Math.PI));
+        cylinder.castShadow = true;
+        cylinder.receiveShadow = true;
+        cylinder.position.x = randInt(-40, 40);
+        cylinder.position.y = randInt(-18, 0);
+        cylinder.position.z = randInt(-25, 25);
+        scene.add(cylinder);
+    }
+}
+
+// Creates a white circle symbolizing the start of 
+// the hole (the tee) at the lower right hand front
+// side of the green.
+function createStart() {
+    const startGeo = new THREE.CircleGeometry(6, 50);
+    const startMat = new THREE.MeshPhongMaterial(
+        {color: 0xffffff, wireframe: false, side: THREE.DoubleSide});
+    const start = new THREE.Mesh(startGeo, startMat);
+    start.receiveShadow = true;
+    start.position.x = 40;
+    start.position.y = -15;
+    start.position.z = 25;
+    start.rotateX(-Math.PI/2);
+    scene.add(start);
+}
+
+// Creates a black hexagon symbolizing the end of
+// the hole (the flag) at the back lower left hand corner
+// of the green.
+// function createGoal() {
+//     const goalGeo = new THREE.CircleGeometry(5, 6);
+//     const goalMat = new THREE.MeshPhongMaterial(
+//         {color: 0x000000, wireframe: false, side: THREE.DoubleSide});
+//     const goal = new THREE.Mesh(goalGeo, goalMat);
+//     goal.receiveShadow = true;
+//     goal.position.x = -40;
+//     goal.position.y = -23.99;
+//     goal.position.z = -25;
+//     goal.rotateX(-Math.PI/2);
+//     scene.add(goal);
+// }
+
+function updateCamera() {
+    //offset the camera x/y based on the mouse's position in the window
+    camera.position.x = cameraCenter.x + (cameraHorzLimit * mouse.x);
+    camera.position.y = cameraCenter.y + (cameraVertLimit * mouse.y) + 60;
+}
+
+function onDocumentMouseMove(event) {
+    event.preventDefault();
+    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+}
+
+function onWindowResize() {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
 }
