@@ -1,3 +1,15 @@
+// Authors: Sam Goertzen and Andrew Coldsmith
+
+// We used code from a lot of tutorials and
+// previous assignments then patched it all
+// together to get this. A lot of the physics
+// engine elements especially were copied from
+// tutorials.
+// Andrew worked on the physics and ball
+// control, while Sam worked on the environment
+// generation and camera controls.
+
+
 //variable declaration section
 let physicsWorld, scene, camera, renderer, rigidBodies = [], tmpTrans = null
 let pos = new THREE.Vector3()
