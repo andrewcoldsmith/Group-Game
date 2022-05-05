@@ -13,7 +13,7 @@
 		<script src="./three.js"></script>
 		<script>
 			const speed = 0.5
-            const sphereCount = 4;
+            const sphereCount = 1;
             let spheres = [];
             let x = [];
             let y = [];
@@ -111,39 +111,6 @@
             sphere1.position.y = 12;
             sphere1.position.z = -18;
             scene.add(sphere1);
-
-            const sphereMat2 = new THREE.MeshPhongMaterial({wireframe: false});
-            const sphere2 = new THREE.Mesh(sphereGeo, sphereMat2);
-            sphere2.material.color.setHSL(hue[1], 1, 0.5);
-            sphere2.castShadow = true;
-            sphere2.receiveShadow = true;
-            spheres.push(sphere2);
-            sphere2.position.x = 10;
-            sphere2.position.y = 10;
-            sphere2.position.z = -12;
-            scene.add(sphere2);
-
-            const sphereMat3 = new THREE.MeshPhongMaterial({wireframe: false});
-            const sphere3 = new THREE.Mesh(sphereGeo, sphereMat3);
-            sphere3.material.color.setHSL(hue[2], 1, 0.5);
-            sphere3.castShadow = true;
-            sphere3.receiveShadow = true;
-            spheres.push(sphere3);
-            sphere3.position.x = -10;
-            sphere3.position.y = -10;
-            sphere3.position.z = 12;
-            scene.add(sphere3);
-
-            const sphereMat4 = new THREE.MeshPhongMaterial({wireframe: false});
-            const sphere4 = new THREE.Mesh(sphereGeo, sphereMat4);
-            sphere4.material.color.setHSL(hue[3], 1, 0.5);
-            sphere4.castShadow = true;
-            sphere4.receiveShadow = true;
-            spheres.push(sphere4);
-            sphere4.position.x = 30;
-            sphere4.position.y = -12;
-            sphere4.position.z = 18;
-            scene.add(sphere4);
 
             renderer.render(scene, camera);
 
